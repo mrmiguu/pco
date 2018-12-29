@@ -33,13 +33,6 @@
   font-size: 0;
 }
 
-/* .face.front  { background: hsla(  0, 100%, 50%, 0.7); }
-.face.right  { background: hsla( 60, 100%, 50%, 0.7); }
-.face.back   { background: hsla(120, 100%, 50%, 0.7); }
-.face.left   { background: hsla(180, 100%, 50%, 0.7); }
-.face.top    { background: hsla(240, 100%, 50%, 0.7); }
-.face.bottom { background: hsla(300, 100%, 50%, 0.7); } */
-
 .face.front  { transform: rotateY(  0deg) translateZ(40vh); }
 .face.right  { transform: rotateY( 90deg) translateZ(40vh); }
 .face.back   { transform: rotateY(180deg) translateZ(40vh); }
@@ -51,7 +44,12 @@
   position: absolute;
   width: 10%;
   height: 10%;
-  background-size: cover;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+.tile img {
+  position: absolute;
+  left: -400%;
 }
 
 .radio-group {
