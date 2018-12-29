@@ -4,6 +4,7 @@ class Store extends Component {
   state = {
     hook: [
       {},
+      // TODO: add callback version of parameter
       items => {
         this.setState(({ hook: [store, setStore] }) => {
           Object.keys(items)
@@ -35,5 +36,5 @@ const generateStore = () => class Temp extends Store {
   }
 }
 
-export const Sheets = generateStore()
-export const Entities = generateStore()
+export const SheetStore = generateStore()
+export const EntityStore = generateStore()
