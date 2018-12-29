@@ -4,10 +4,19 @@ class Store extends Component {
   state = {
     hook: [
       {},
-      item => {
-        this.setState(({ hook: [store, setStore] }) => ({
-          hook: [{...store, ...item}, setStore]
-        }))
+      items => {
+        this.setState(({ hook: [store, setStore] }) => {
+          Object.keys(items)
+            .filter(item => items[item] === null)
+            .forEach(item => {
+              delete items[item]
+              delete store[item]
+            })
+
+          return {
+            hook: [{...store, ...items}, setStore]
+          }
+        })
       }
     ]
   }
@@ -27,3 +36,4 @@ const generateStore = () => class Temp extends Store {
 }
 
 export const Sheets = generateStore()
+export const Entities = generateStore()

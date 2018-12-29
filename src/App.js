@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import './styles/App.css'
-import { Sheets } from './Stores'
+import { Sheets, Entities } from './Stores'
 import tiles_desert from './assets/tiles/desert.png'
+import sprites from './assets/sprites.png'
 
 const tileSize = 32
 
@@ -15,55 +16,93 @@ const sides = [
 ]
 
 class Tile extends Component {
+  
   static contextType = Sheets.contextType
   
   render() {
-    const { xy: [x, y] } = this.props
+    const { src, xy: [x, y], sxy: [sx, sy] } = this.props
     const [ sheets, setSheet ] = this.context
 
     return (
       <div
         className="tile"
+        onClick={this.props.onClick}
+        onMouseDown={this.props.onMouseDown}
+        onTouchStart={this.props.onTouchStart}
         style={{
           top: `${x*10}%`,
           left: `${y*10}%`,
         }}
       >
-        {sheets[tiles_desert]? (
+        {sheets[src]? (
           <img
-            src={tiles_desert}
+            src={src}
             alt=""
             style={{
-              width: `${100*sheets[tiles_desert].width/tileSize}%`,
-              height: `${100*sheets[tiles_desert].height/tileSize}%`,
+              width: `${100*sheets[src].width/tileSize}%`,
+              height: `${100*sheets[src].height/tileSize}%`,
+              left: `${-100*sx}%`,
+              top: `${-100*sy}%`,
             }}
           />
         ) : (
           <img
-            src={tiles_desert}
+            src={src}
             alt=""
             onLoad={({ target: {width, height} }) => setSheet({
-              [tiles_desert]: {width, height}
+              [src]: {width, height}
             })}
           />
+        )}
+        {React.Children.map(this.props.children, child =>
+          React.cloneElement(child, {xy: [x, y]})
         )}
       </div>
     )
   }
 }
 
-const Face = ({ side }) => (
-  <div className={`face ${side || sides[0]}`}>
-    {
-      [...Array(100).keys()].map(i =>
-        <Tile
-          key={i}
-          xy={[~~(i%10), ~~(i/10)]}
-        />
-      )
-    }
-  </div>
-)
+class Face extends Component {
+
+  static contextType = Entities.contextType
+  
+  render() {
+    const { side } = this.props
+    const [ entities, setEntity ] = this.context
+    
+    return (
+      <div className={`face ${side || sides[0]}`}>
+        {
+          [...Array(100).keys()].map(i => {
+            const x = ~~(i%10)
+            const y = ~~(i/10)
+            const loc = `${side},${x},${y}`
+
+            return (
+              <Tile
+                key={i}
+                xy={[x, y]}
+                src={tiles_desert}
+                sxy={[0, 0]}
+                onMouseDown={() => setEntity({[loc]: entities[loc]? null : true})}
+                onTouchStart={() => setEntity({[loc]: entities[loc]? null : true})}
+              >
+                {
+                  entities[loc]? (
+                    <Tile
+                      src={sprites}
+                      sxy={[0, 6]}
+                    ></Tile>
+                  ) : null
+                }
+              </Tile>
+            )
+          })
+        }
+      </div>
+    )
+  }
+}
 
 class App extends Component {
 
@@ -77,14 +116,16 @@ class App extends Component {
       <div className="scene">
         <div className={`camera ${side || sides[0]}`}>
           <Sheets>
-            {
-              sides.map(side =>
-                <Face
-                  key={side}
-                  side={side}
-                />
-              )
-            }
+            <Entities>
+              {
+                sides.map(side =>
+                  <Face
+                    key={side}
+                    side={side}
+                  />
+                )
+              }
+            </Entities>
           </Sheets>
         </div>
       </div>
