@@ -23,9 +23,15 @@ class Store extends Component {
   }
 }
 
-const generateStore = () => class Temp extends Store {
+const generateStore = init => class Temp extends Store {
 
   static contextType = createContext()
+
+  componentDidMount() {
+    if (!init) return
+    const [, setStore ] = this.state.hook
+    setStore(init)
+  }
 
   render() {
     return (
@@ -37,4 +43,7 @@ const generateStore = () => class Temp extends Store {
 }
 
 export const SheetStore = generateStore()
-export const EntityStore = generateStore()
+
+export const EntityStore = generateStore({
+  // 'front,4,4': true,
+})

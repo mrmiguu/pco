@@ -25,86 +25,28 @@ const sideToTile = {
   'bottom': [3, 1],
 }
 
-const defaultSide = 'left'
+const defaultSide = 'front'
 
 const sideToTransform = {
-  'front':     ([x, y]) => `translateZ(-40vmax) rotateY(   ${0 - ~~(x-4.5)*10}deg) rotateX(${0 + ~~(y-4.5)*10}deg)`,
-  'right':     ([x, y]) => `translateZ(-40vmax) rotateY( ${-90 - ~~(x-4.5)*10}deg) rotateZ(${0 - ~~(y-4.5)*10}deg)`,
-  'back':      ([x, y]) => `translateZ(-40vmax) rotateY(${-180 - ~~(x-4.5)*10}deg) rotateX(${-180 - ~~(y-4.5)*10}deg)`,//wip
-  'left':      ([x, y]) => `translateZ(-40vmax) rotateY(  ${90 - ~~(x-4.5)*10}deg) rotateZ(${0 + ~~(y-4.5)*10}deg)`,
-  'top':       ([x, y]) => `translateZ(-40vmax) rotateX( ${-90 - ~~(x-4.5)*10}deg) rotateX(${-90 + ~~(y-4.5)*10}deg)`,//wip
-  'bottom':    ([x, y]) => `translateZ(-40vmax) rotateX(  ${90 - ~~(x-4.5)*10}deg) rotateX(${90 + ~~(y-4.5)*10}deg)`,//wip
+  'front':  ([x, y]) => `translateZ(-40vmax) rotateY(   ${0 - ~~(x-4.5)*10}deg) rotateX(${0 + ~~(y-4.5)*10}deg)`,
+  'right':  ([x, y]) => `translateZ(-40vmax) rotateY( ${-90 - ~~(x-4.5)*10}deg) rotateZ(${0 - ~~(y-4.5)*10}deg)`,
+  'back':   ([x, y]) => `translateZ(-40vmax) rotateY(${-180 - ~~(x-4.5)*10}deg) rotateX(${0 - ~~(y-4.5)*10}deg)`,
+  'left':   ([x, y]) => `translateZ(-40vmax) rotateY(  ${90 - ~~(x-4.5)*10}deg) rotateZ(${0 + ~~(y-4.5)*10}deg)`,
+  'top':    ([x, y]) => `translateZ(-40vmax) rotateX( ${-90 + ~~(y-4.5)*10}deg) rotateZ(${0 - ~~(x-4.5)*10}deg)`,
+  'bottom': ([x, y]) => `translateZ(-40vmax) rotateX(  ${90 + ~~(y-4.5)*10}deg) rotateZ(${0 + ~~(x-4.5)*10}deg)`,
 }
 
-// // tilts the die to the edges your closest to
-// adjustedDieRotation() {
-//   let rotation = { 
-//     x: this.dieRotation.x,
-//     y: this.dieRotation.y,
-//     z: this.dieRotation.z
-//   };
+const keyToLR = {
+  'ArrowLeft': 'left',
+  'ArrowRight': 'right',
+}
 
-//   //dont tilt the die if we're looking at a face other than the one the player is on
-//   if (store.player.location.face != this.currentFace) {
-//     return rotation;
-//   }
+const keyToUD = {
+  'ArrowUp': 'up',
+  'ArrowDown': 'down',
+}
 
-//   //determine which axes to shift based on col and row position for each face
-//   const faceAxes = [
-//     { col: 'y', colMultiplier: '-1', row: 'x', rowMultiplier: '1' }, 	//ONE
-//     { col: 'y', colMultiplier: '-1', row: 'z', rowMultiplier: '1' }, 	//TWO
-//     { col: 'z', colMultiplier: '1', row: 'x', rowMultiplier: '1' }, 	//THREE
-//     { col: 'z', colMultiplier: '-1', row: 'x', rowMultiplier: '1' }, 	//FOUR
-//     { col: 'y', colMultiplier: '-1', row: 'z', rowMultiplier: '1' }, 	//FIVE
-//     { col: 'y', colMultiplier: '1', row: 'x', rowMultiplier: '1' }, 	//SIX
-//   ];
-
-//   //make column-based adjustments
-//   switch (store.player.location.col) {
-//     case 6:
-//       rotation[faceAxes[this.currentFace].col] += (30 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//     case 5:
-//       rotation[faceAxes[this.currentFace].col] += (18 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//     case 4:
-//       rotation[faceAxes[this.currentFace].col] += (10 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//     case 2:
-//       rotation[faceAxes[this.currentFace].col] -= (10 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//     case 1:
-//       rotation[faceAxes[this.currentFace].col] -= (18 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//     case 0:
-//       rotation[faceAxes[this.currentFace].col] -= (30 * faceAxes[this.currentFace].colMultiplier);
-//       break;
-//   }
-
-//   //make row-based adjustments
-//   switch (store.player.location.row) {
-//     case 6:
-//       rotation[faceAxes[this.currentFace].row] += (30 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//     case 5:
-//       rotation[faceAxes[this.currentFace].row] += (18 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//     case 4:
-//       rotation[faceAxes[this.currentFace].row] += (10 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//     case 2:
-//       rotation[faceAxes[this.currentFace].row] -= (10 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//     case 1:
-//       rotation[faceAxes[this.currentFace].row] -= (18 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//     case 0:
-//       rotation[faceAxes[this.currentFace].row] -= (30 * faceAxes[this.currentFace].rowMultiplier);
-//       break;
-//   }
-
-//   return rotation;
-// }
+const ms250 = t => (t || Date.now())/250 - (t || Date.now())/250%1
 
 class Tile extends Component {
   
@@ -158,8 +100,12 @@ class Face extends Component {
   static contextType = EntityStore.contextType
   
   render() {
-    const { side } = this.props
+    const { side, xy } = this.props
     const [ entities, setEntity ] = this.context
+
+    if (xy) {
+      console.log(`xy ${JSON.stringify(xy)}`)
+    }
     
     return (
       <div className={`face ${side || defaultSide}`}>
@@ -181,11 +127,17 @@ class Face extends Component {
                 }}
               >
                 {
-                  entities[loc]? (
+                  xy && xy[1] === x && xy[0] === y? (
                     <Tile
                       className="entity"
                       src={sprites}
                       sxy={[0, 6]}
+                    ></Tile>
+                  ) : entities[loc]? (
+                    <Tile
+                      className="entity"
+                      src={sprites}
+                      sxy={[0, 2]}
                     ></Tile>
                   ) : null
                 }
@@ -198,12 +150,109 @@ class Face extends Component {
   }
 }
 
+const Camera = ({ face, xy }) => (
+  <div
+    className={`camera ${face || defaultSide}`}
+    style={{
+      transform: (sideToTransform[face] || sideToTransform[defaultSide])(xy)
+    }}
+  >
+    <SheetStore>
+      {
+        sides.map(side =>
+          side === face? (
+            <Face
+              key={side}
+              side={side}
+              xy={xy}
+            />
+          ) : (
+            <Face
+              key={side}
+              side={side}
+            />
+          )
+        )
+      }
+    </SheetStore>
+  </div>
+)
+
 class App extends Component {
 
-  state = {}
+  state = {
+    to: [null, null],
+    xy: [0,1],
+    side: 'front',
+  }
+
+  componentDidMount() {
+    window.addEventListener('keydown', this.keyDown)
+    window.addEventListener('keyup', this.keyUp)
+
+    if (!this.animFrameRef) {
+      this.animFrameRef = window.requestAnimationFrame(this.animFrame)
+    }
+  }
+
+  keyDown = e => {
+    this.setState(({ to: [lr, ud], dir }) => {
+      const newLR = keyToLR[e.key] || lr
+      const newUD = keyToUD[e.key] || ud
+  
+      if (newLR === lr && newUD === ud) return
+
+      return {
+        to: [newLR, newUD],
+        dir: newLR || newUD || dir
+      }
+    })
+  }
+
+  keyUp = e => {
+    this.setState(({ to: [lr, ud], dir }) => {
+      const newLR = keyToLR[e.key]
+      const newUD = keyToUD[e.key]
+  
+      if (!newLR && !newUD) return
+
+      return {
+        to: [newLR? null : lr, newUD? null : ud],
+        dir: ud || lr || dir
+      }
+    })
+  }
+
+  animFrame = time => {
+    this.setState(({ xy: [x, y], to: [lr, ud], last250ms }) => {
+      let state = {}
+      
+      if (ms250() !== last250ms) {
+        if (lr || ud) {
+          state.xy = [
+            lr === 'left'? x-1 : lr === 'right'? x+1 : x,
+            ud === 'up'? y-1 : ud === 'down'? y+1 : y
+          ]
+
+          state.last250ms = ms250()
+        }
+      }
+
+      if (Object.keys(state).length) return state
+    })
+
+    this.animFrameRef = window.requestAnimationFrame(this.animFrame)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.keyDown)
+    window.removeEventListener('keyup', this.keyUp)
+
+    window.cancelAnimationFrame(this.animFrameRef)
+  }
 
   render() {
-    const { side } = this.state
+    const { side, xy } = this.state
     
     return (
       <div
@@ -212,25 +261,9 @@ class App extends Component {
         }}
       >
         <div className="scene">
-          <div
-            className={`camera ${side || defaultSide}`}
-            style={{
-              transform: (sideToTransform[side] || sideToTransform[defaultSide])([2,2])
-            }}
-          >
-            <SheetStore>
-              <EntityStore>
-                {
-                  sides.map(side =>
-                    <Face
-                      key={side}
-                      side={side}
-                    />
-                  )
-                }
-              </EntityStore>
-            </SheetStore>
-          </div>
+          <EntityStore>
+            <Camera face={side} xy={xy} />
+          </EntityStore>
         </div>
 
         <p className="radio-group">
@@ -239,7 +272,7 @@ class App extends Component {
               <input
                 key={side}
                 type="radio"
-                name="rotate-cube-side"
+                name="camera-face"
                 onChange={() => this.setState({ side })}
               />
             )
