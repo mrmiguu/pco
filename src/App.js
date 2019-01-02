@@ -51,65 +51,150 @@ const ms250 = t => (t || Date.now())/250 - (t || Date.now())/250%1
 class Tile extends Component {
   
   static contextType = SheetStore.contextType
+
+  componentDidMount() {
+    this.draw()
+  }
+
+  draw = () => {
+    const { ctx, xy: [x, y], sxy: [sx, sy] } = this.props
+
+    if (!ctx) return
+
+    ctx.drawImage(
+      this.refs.img,
+      sx*tileSize, sy*tileSize, tileSize, tileSize,
+      x*tileSize, y*tileSize, tileSize, tileSize
+    )
+  }
+
+  onLoad = ({ target }) => {
+    const { width, height } = target
+    const { src } = this.props
+    const [ sheets, setSheets ] = this.context
+    
+    this.draw()
+
+    if (!sheets[src]) {
+      setSheets({
+        [src]: {width, height}
+      })
+    }
+  }
   
   render() {
-    const { src, xy: [x, y], sxy: [sx, sy] } = this.props
-    const [ sheets, setSheet ] = this.context
+    const { ctx, src, xy: [x, y], sxy: [sx, sy] } = this.props
+    const [ sheets ] = this.context
 
-    return (
+    return <>
       <div
-        className={`${this.props.className} tile`}
+        className={`${this.props.className} tile edit`}
         onClick={this.props.onClick}
         onMouseDown={this.props.onMouseDown}
         onTouchStart={this.props.onTouchStart}
         style={{
-          top: `${x*10}%`,
-          left: `${y*10}%`,
+          left: `${x*10}%`,
+          top: `${y*10}%`,
         }}
       >
-        {sheets[src]? (
-          <img
-            src={src}
-            alt=""
-            style={{
-              width: `${100*sheets[src].width/tileSize}%`,
+        <img
+          ref="img"
+
+          src={src}
+          alt=""
+          onLoad={this.onLoad}
+          
+          style={{
+            left: `${-101*sx}%`,
+            top: `${-101*sy}%`,
+
+            ...sheets[src]? {
+              width:  `${100*sheets[src].width/tileSize}%`,
               height: `${100*sheets[src].height/tileSize}%`,
-              left: `${-100*sx}%`,
-              top: `${-100*sy}%`,
-            }}
-          />
-        ) : (
-          <img
-            src={src}
-            alt=""
-            onLoad={({ target: {width, height} }) => setSheet({
-              [src]: {width, height}
-            })}
-          />
-        )}
-        {React.Children.map(this.props.children, child =>
-          React.cloneElement(child, {xy: [x, y]})
-        )}
+            } : {},
+            
+            display: ctx? 'none' : 'initial',
+          }}
+        />
       </div>
-    )
+      {React.Children.map(this.props.children, child =>
+        React.cloneElement(child, {xy: [x, y]})
+      )}
+    </>
   }
 }
 
 class Face extends Component {
 
   static contextType = EntityStore.contextType
+
+  state = {}
+
+  componentDidMount() {
+    this.setState({
+      ctx: this.refs.canvas.getContext('2d')
+    })
+  }
   
   render() {
     const { side, xy } = this.props
-    const [ entities, setEntity ] = this.context
+    const { ctx } = this.state
+    const [ entities, setEntities ] = this.context
 
-    if (xy) {
-      console.log(`xy ${JSON.stringify(xy)}`)
-    }
-    
+    const evs = Object.values(entities)
+    const ekvs = Object.entries(entities)
+
     return (
       <div className={`face ${side || defaultSide}`}>
+
+        <canvas
+          ref="canvas"
+          width={10*tileSize}
+          height={10*tileSize}
+        />
+
         {
+          [...Array(100).keys()].map(i => {
+            const x = ~~(i%10)
+            const y = ~~(i/10)
+
+            return (
+              <Tile
+                key={`${i},${!!ctx}`}
+                ctx={ctx}
+                xy={[x, y]}
+                src={tiles_desert}
+                sxy={sideToTile[side]}
+
+                onClick={() => setEntities({
+                  [Date.now()]: {side, x, y}
+                })}
+              >
+              </Tile>
+            )
+          })
+        }
+
+        {
+          ekvs.map(([ id, e ]) => e.side === side? (
+            <Tile
+              key={id}
+              className="entity"
+              xy={[e.x, e.y]}
+              src={sprites}
+              sxy={[0,2]}
+
+              onClick={() => {
+                setEntities({
+                  [id]: null
+                })
+              }}
+
+            ></Tile>
+          ) : null)
+        }
+
+        {/* {
           [...Array(100).keys()].map(i => {
             const x = ~~(i%10)
             const y = ~~(i/10)
@@ -123,11 +208,11 @@ class Face extends Component {
                 src={tiles_desert}
                 sxy={sideToTile[side]}
                 onClick={() => {
-                  setEntity({[loc]: entities[loc]? null : true})
+                  setEntities({[loc]: entities[loc]? null : true})
                 }}
               >
                 {
-                  xy && xy[1] === x && xy[0] === y? (
+                  xy && xy[0] === x && xy[1] === y? (
                     <Tile
                       className="entity"
                       src={sprites}
@@ -144,7 +229,7 @@ class Face extends Component {
               </Tile>
             )
           })
-        }
+        } */}
       </div>
     )
   }
@@ -158,22 +243,17 @@ const Camera = ({ face, xy }) => (
     }}
   >
     <SheetStore>
-      {
-        sides.map(side =>
-          side === face? (
+      <EntityStore>
+        {
+          sides.map(side =>
             <Face
               key={side}
               side={side}
-              xy={xy}
-            />
-          ) : (
-            <Face
-              key={side}
-              side={side}
+              xy={side === face? xy : null}
             />
           )
-        )
-      }
+        }
+      </EntityStore>
     </SheetStore>
   </div>
 )
@@ -182,8 +262,8 @@ class App extends Component {
 
   state = {
     to: [null, null],
-    xy: [0,1],
     side: 'front',
+    xy: [4,4],
   }
 
   componentDidMount() {
@@ -261,9 +341,7 @@ class App extends Component {
         }}
       >
         <div className="scene">
-          <EntityStore>
-            <Camera face={side} xy={xy} />
-          </EntityStore>
+          <Camera face={side} xy={xy} />
         </div>
 
         <p className="radio-group">

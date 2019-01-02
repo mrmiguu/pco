@@ -9,13 +9,12 @@
 .scene {
   width: 80vmax;
   height: 80vmax;
-  
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-
   perspective: 160vmax;
+  image-rendering: pixelated;
 }
 
 .camera {
@@ -45,24 +44,26 @@
 .face.top    { transform: rotateX( 90deg) translateZ(40vmax); }
 .face.bottom { transform: rotateX(-90deg) translateZ(40vmax); }
 
+.face > canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 .face > .tile {
   position: absolute;
-  width: 10.05%;
-  height: 10.05%;
+  width: 10%;
+  height: 10%;
   overflow: hidden;
-  image-rendering: pixelated;
 }
 
 .tile img {
   position: absolute;
-  left: 0;
 }
 
 .entity {
+  image-rendering: pixelated;
   transition: left .25s, top .25s;
-}
-.entity img {
-  /* background: rgba(255, 255, 255, 0.25); */
 }
 
 .edit.icon {
@@ -80,7 +81,8 @@
   transition: transform 3s linear;
 }
 .edit.tile {
-  border: .2vmax dashed black;
+  border-left: .2vmax dashed black;
+  border-top: .2vmax dashed black;
 }
 
 .radio-group {
