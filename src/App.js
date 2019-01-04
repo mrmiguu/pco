@@ -47,6 +47,7 @@ const keyToUD = {
 }
 
 const ms250 = t => (t || Date.now())/250 - (t || Date.now())/250%1
+const ms500 = t => (t || Date.now())/500 - (t || Date.now())/500%1
 
 class Tile extends Component {
   
@@ -88,7 +89,7 @@ class Tile extends Component {
 
     return <>
       <div
-        className={`${this.props.className} tile edit`}
+        className={`${this.props.className} tile`}
         onClick={this.props.onClick}
         onMouseDown={this.props.onMouseDown}
         onTouchStart={this.props.onTouchStart}
@@ -105,8 +106,8 @@ class Tile extends Component {
           onLoad={this.onLoad}
           
           style={{
-            left: `${-101*sx}%`,
-            top: `${-101*sy}%`,
+            left: `${-100*sx}%`,
+            top: `${-100*sy}%`,
 
             ...sheets[src]? {
               width:  `${100*sheets[src].width/tileSize}%`,
@@ -161,6 +162,7 @@ class Face extends Component {
             return (
               <Tile
                 key={`${i},${!!ctx}`}
+                className="edit"
                 ctx={ctx}
                 xy={[x, y]}
                 src={tiles_desert}
@@ -194,42 +196,17 @@ class Face extends Component {
           ) : null)
         }
 
-        {/* {
-          [...Array(100).keys()].map(i => {
-            const x = ~~(i%10)
-            const y = ~~(i/10)
-            const loc = `${side},${x},${y}`
+        {
+          xy? (
+            <Tile
+              className="entity"
+              xy={xy}
+              sxy={[0, 6]}
+              src={sprites}
+            ></Tile>
+          ) : null
+        }
 
-            return (
-              <Tile
-                // className="edit"
-                key={i}
-                xy={[x, y]}
-                src={tiles_desert}
-                sxy={sideToTile[side]}
-                onClick={() => {
-                  setEntities({[loc]: entities[loc]? null : true})
-                }}
-              >
-                {
-                  xy && xy[0] === x && xy[1] === y? (
-                    <Tile
-                      className="entity"
-                      src={sprites}
-                      sxy={[0, 6]}
-                    ></Tile>
-                  ) : entities[loc]? (
-                    <Tile
-                      className="entity"
-                      src={sprites}
-                      sxy={[0, 2]}
-                    ></Tile>
-                  ) : null
-                }
-              </Tile>
-            )
-          })
-        } */}
       </div>
     )
   }
@@ -263,7 +240,7 @@ class App extends Component {
   state = {
     to: [null, null],
     side: 'front',
-    xy: [4,4],
+    xy: [2,2],
   }
 
   componentDidMount() {
@@ -304,17 +281,17 @@ class App extends Component {
   }
 
   animFrame = time => {
-    this.setState(({ xy: [x, y], to: [lr, ud], last250ms }) => {
+    this.setState(({ xy: [x, y], to: [lr, ud], last500ms }) => {
       let state = {}
       
-      if (ms250() !== last250ms) {
+      if (ms500() !== last500ms) {
         if (lr || ud) {
           state.xy = [
             lr === 'left'? x-1 : lr === 'right'? x+1 : x,
             ud === 'up'? y-1 : ud === 'down'? y+1 : y
           ]
 
-          state.last250ms = ms250()
+          state.last500ms = ms500()
         }
       }
 
