@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import './styles/App.css'
-import { sides, keyToLR, keyToUD, ms500 } from './consts'
+import { sides, keyToLR, keyToUD } from './consts'
 import Camera from './Camera'
 
 import background from './assets/background.png'
@@ -17,16 +17,36 @@ class App extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.keyDown)
     window.addEventListener('keyup', this.keyUp)
+    window.addEventListener('mousedown', this.mouseDown)
+    window.addEventListener('mousemove', e => this.move(e.movementX, e.movementY))
+    window.addEventListener('mouseup', this.mouseUp)
+
+    window.addEventListener('touchstart', this.mouseDown)
+
+    let dXY = [0,0]
+    window.addEventListener('touchmove', e => {
+      const [ dX, dY ] = dXY
+      this.move(e.touches[0].pageX-dX, e.touches[0].pageY-dY)
+      dXY = [e.touches[0].pageX, e.touches[0].pageY]
+    })
+    
+    window.addEventListener('touchend', this.mouseUp)
 
     if (!this.animFrameRef) {
       this.animFrameRef = window.requestAnimationFrame(this.animFrame)
     }
   }
 
-  keyDown = e => {
+  mouseDown = e => {
+    this.setState({
+      mouseDown: true
+    })
+  }
+
+  toDirOn = (dLR, dUD) => {
     this.setState(({ to: [lr, ud], dir }) => {
-      const newLR = keyToLR[e.key] || lr
-      const newUD = keyToUD[e.key] || ud
+      const newLR = dLR || lr
+      const newUD = dUD || ud
   
       if (newLR === lr && newUD === ud) return
 
@@ -37,32 +57,64 @@ class App extends Component {
     })
   }
 
+  toDirOff = (dLR, dUD) => {
+    if (!dLR && !dUD) return
+
+    this.setState(({ to: [lr, ud], dir }) => ({
+      to: [dLR? null : lr, dUD? null : ud],
+      dir: ud || lr || dir
+    }))
+  }
+
+  keyDown = e => {
+    this.toDirOn(keyToLR[e.key], keyToUD[e.key])
+  }
+
   keyUp = e => {
+    this.toDirOff(keyToLR[e.key], keyToUD[e.key])
+  }
+
+  move = (dX, dY) => {
+    const { mouseDown } = this.state
+    
+    if (!mouseDown) return
+    
+    const dLR = dX < -1? 'left' : dX > 1? 'right' : null
+    const dUD = dY < -1? 'up' : dY > 1? 'down' : null
+
     this.setState(({ to: [lr, ud], dir }) => {
-      const newLR = keyToLR[e.key]
-      const newUD = keyToUD[e.key]
+      const newLR = dLR || (lr && ud? dLR : lr)
+      const newUD = dUD || (lr && ud? dUD : ud)
   
-      if (!newLR && !newUD) return
+      if (newLR === lr && newUD === ud) return
 
       return {
-        to: [newLR? null : lr, newUD? null : ud],
-        dir: ud || lr || dir
+        to: [newLR, newUD],
+        dir: newLR || newUD || dir
       }
     })
+  }
+
+  mouseUp = e => {
+    this.setState(({ to: [lr, ud], dir }) => ({
+      mouseDown: false,
+      to: [null, null],
+      dir: ud || lr || dir
+    }))
   }
 
   animFrame = time => {
     this.setState(({ xy: [x, y], to: [lr, ud], last500ms }) => {
       let state = {}
       
-      if (ms500() !== last500ms) {
+      if (Date.now() >= (last500ms||0)+500) {
         if (lr || ud) {
           state.xy = [
             lr === 'left'? x-1 : lr === 'right'? x+1 : x,
             ud === 'up'? y-1 : ud === 'down'? y+1 : y
           ]
 
-          state.last500ms = ms500()
+          state.last500ms = Date.now()
         }
       }
 

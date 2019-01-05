@@ -32,11 +32,15 @@ export const sideToTile = {
 export const keyToLR = {
   'ArrowLeft': 'left',
   'ArrowRight': 'right',
+  'a': 'left',
+  'd': 'right',
 }
 
 export const keyToUD = {
   'ArrowUp': 'up',
   'ArrowDown': 'down',
+  'w': 'up',
+  's': 'down',
 }
 
 export const ms500 = t => (t || Date.now())/500 - (t || Date.now())/500%1
