@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import './styles/App.css'
-import { sides, keyToLR, keyToUD } from './consts'
+import { sides, keyToLR, keyToUD, edgeTransform, defaultSide, defaultXY } from './consts'
 import Camera from './Camera'
 
 import background from './assets/background.png'
@@ -9,9 +9,9 @@ import background from './assets/background.png'
 class App extends Component {
 
   state = {
-    to: [null, null],
-    side: 'front',
-    xy: [2,2],
+    to:   [null, null],
+    side: defaultSide,
+    xy:   defaultXY,
   }
 
   componentDidMount() {
@@ -104,17 +104,23 @@ class App extends Component {
   }
 
   animFrame = time => {
-    this.setState(({ xy: [x, y], to: [lr, ud], last500ms }) => {
+    this.setState(({ side, xy: [x, y], to: [lr, ud], last500ms }) => {
+
       let state = {}
       
       if (Date.now() >= (last500ms||0)+500) {
         if (lr || ud) {
-          state.xy = [
+
+          const xy = [
             lr === 'left'? x-1 : lr === 'right'? x+1 : x,
             ud === 'up'? y-1 : ud === 'down'? y+1 : y
           ]
 
-          state.last500ms = Date.now()
+          state = {
+            ...state,
+            ...edgeTransform(side, xy),
+            last500ms: Date.now(),
+          }
         }
       }
 

@@ -24,12 +24,12 @@
   transition: transform .5s linear;
 }
 
-/* .camera.front  { transform: translateZ(-40vmax) rotateY(   0deg); } */
-/* .camera.right  { transform: translateZ(-40vmax) rotateY( -90deg); } */
-/* .camera.back   { transform: translateZ(-40vmax) rotateY(-180deg); } */
-/* .camera.left   { transform: translateZ(-40vmax) rotateY(  90deg); } */
-/* .camera.top    { transform: translateZ(-40vmax) rotateX( -90deg); } */
-/* .camera.bottom { transform: translateZ(-40vmax) rotateX(  90deg); } */
+/* .camera.front  { transform: translateZ(-40vmax) rotateY(  0deg) rotateZ(  0deg); } */
+/* .camera.right  { transform: translateZ(-40vmax) rotateY(-90deg) rotateX(-90deg); } */
+/* .camera.back   { transform: translateZ(-40vmax) rotateY(180deg) rotateZ(180deg); } */
+/* .camera.left   { transform: translateZ(-40vmax) rotateY( 90deg) rotateX( 90deg); } */
+/* .camera.top    { transform: translateZ(-40vmax) rotateX(-90deg) rotateY(-90deg); } */
+/* .camera.bottom { transform: translateZ(-40vmax) rotateX( 90deg) rotateY(-90deg); } */
 
 .face {
   width: 100%;
@@ -37,12 +37,12 @@
   position: absolute;
 }
 
-.face.front  { transform: rotateY(  0deg) translateZ(40vmax); }
-.face.right  { transform: rotateY( 90deg) translateZ(40vmax); }
-.face.back   { transform: rotateY(180deg) translateZ(40vmax); }
-.face.left   { transform: rotateY(-90deg) translateZ(40vmax); }
-.face.top    { transform: rotateX( 90deg) translateZ(40vmax); }
-.face.bottom { transform: rotateX(-90deg) translateZ(40vmax); }
+.face.front  { transform: rotateY(  0deg) rotateZ(  0deg) translateZ(40vmax); }
+.face.right  { transform: rotateY( 90deg) rotateZ( 90deg) translateZ(40vmax); }
+.face.back   { transform: rotateY(180deg) rotateZ(180deg) translateZ(40vmax); }
+.face.left   { transform: rotateY(-90deg) rotateZ( 90deg) translateZ(40vmax); }
+.face.top    { transform: rotateX( 90deg) rotateZ(-90deg) translateZ(40vmax); }
+.face.bottom { transform: rotateX(-90deg) rotateZ( 90deg) translateZ(40vmax); }
 
 .face > canvas {
   position: absolute;
