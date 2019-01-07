@@ -48,6 +48,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
+  user-select: none;
 }
 
 .face > .tile {
@@ -62,24 +63,37 @@
 }
 
 .entity {
-  image-rendering: pixelated;
   transition: left .5s linear, top .5s linear;
 }
 
-.edit.icon {
-  position: absolute;
+.ui {
+  position: relative;
+  float: right;
   margin: 1vmax;
   padding: .5vmax;
-  right: 0;
-  font-size: 5vmax;
   background: rgba(255, 255, 255, .5);
   border-radius: 1vmax;
+}
+.ui.icons {
+  float: right;
+}
+.ui.icons span {
+  font-size: 5vmax;
   cursor: pointer;
+  user-select: none;
+}
+.ui.tile-picker {
+  right: 0;
+  width: 70vmin;
+}
+.ui.tile-picker img {
+  width: 100%;
 }
 
-.edit.camera {
-  transition: transform 3s linear;
+img {
+  image-rendering: pixelated;
 }
+
 .edit.tile {
   border-left: .2vmax dashed black;
   border-top: .2vmax dashed black;

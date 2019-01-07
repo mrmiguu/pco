@@ -4,6 +4,7 @@ import './styles/App.css'
 import { sides, keyToLR, keyToUD, edgeTransform, defaultSide, defaultXY } from './consts'
 import Camera from './Camera'
 
+import tiles_desert from './assets/tiles/desert.png'
 import background from './assets/background.png'
 
 class App extends Component {
@@ -138,7 +139,7 @@ class App extends Component {
   }
 
   render() {
-    const { side, xy } = this.state
+    const { side, xy, isMenuOpen, isEditing, isPickingTile } = this.state
     
     return (
       <div
@@ -147,25 +148,65 @@ class App extends Component {
         }}
       >
         <div className="scene">
-          <Camera face={side} xy={xy} />
+          <Camera face={side} xy={xy} isEditing={isEditing} />
         </div>
 
-        <p className="radio-group">
+        {
+          isEditing? (
+            <p className="radio-group">
+              {
+                sides.map(s =>
+                  <input
+                    key={s}
+                    type="radio"
+                    name="camera-face"
+                    onChange={() => this.setState({ side: s })}
+                    checked={s === side}
+                  />
+                )
+              }
+            </p>
+          ) : null
+        }
+
+        <div className="ui icons">️
+
           {
-            sides.map(side =>
-              <input
-                key={side}
-                type="radio"
-                name="camera-face"
-                onChange={() => this.setState({ side })}
-              />
-            )
+            isMenuOpen? <>
+
+              <span
+                onClick={() => this.setState(({ isPickingTile }) => ({
+                  isPickingTile: !isPickingTile,
+                  isMenuOpen: !isPickingTile,
+                }))}
+              >🗺</span>
+
+              <span
+                onClick={() => this.setState(({ isEditing }) => ({
+                  isEditing: !isEditing,
+                  isMenuOpen: !isEditing,
+                }))}
+              >🛠</span>
+
+            </> : null
           }
-        </p>
-        <div
-          className="edit icon"
-          onClick={() => {}}
-        >🛠</div>
+
+          <span
+            onClick={() => this.setState(({ isMenuOpen }) => ({
+              isMenuOpen: !isMenuOpen,
+            }))}
+          >⚙</span>
+
+        </div>
+
+        {
+          isPickingTile? (
+            <div className="ui tile-picker">
+              <img src={tiles_desert} alt="" />
+            </div>
+          ) : null
+        }
+        
       </div>
     )
   }

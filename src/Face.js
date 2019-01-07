@@ -20,7 +20,7 @@ class Face extends Component {
   }
   
   render() {
-    const { side, xy } = this.props
+    const { side, xy, isEditing } = this.props
     const { ctx } = this.state
     const [ entities, setEntities ] = this.context
 
@@ -43,15 +43,20 @@ class Face extends Component {
             return (
               <Tile
                 key={`${i},${!!ctx}`}
-                className="edit"
+                className={isEditing? 'edit' : null}
                 ctx={ctx}
                 xy={[x, y]}
                 src={tiles_desert}
                 sxy={sideToTile[side]}
 
-                onClick={() => setEntities({
-                  [Date.now()]: {side, x, y}
-                })}
+                {
+                  ...isEditing? {
+                    onClick: () => setEntities({
+                      [Date.now()]: {side, x, y}
+                    })
+                  } : {}
+                }
+                
               >
               </Tile>
             )
@@ -67,11 +72,13 @@ class Face extends Component {
               src={sprites}
               sxy={[0,2]}
 
-              onClick={() => {
-                setEntities({
-                  [id]: null
-                })
-              }}
+              {
+                ...isEditing? {
+                  onClick: () => setEntities({
+                    [id]: null
+                  })
+                } : {}
+              }
 
             ></Tile>
           ) : null)

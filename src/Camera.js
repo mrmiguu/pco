@@ -4,7 +4,7 @@ import { defaultSide, sideToTransform, sides } from './consts'
 import { SheetStore, EntityStore } from './Stores'
 import Face from './Face'
 
-const Camera = ({ face, xy }) => (
+const Camera = ({ face, xy, isEditing }) => (
   <div
     className={`camera ${face || defaultSide}`}
     style={{
@@ -19,6 +19,7 @@ const Camera = ({ face, xy }) => (
               key={side}
               side={side}
               xy={side === face? xy : null}
+              isEditing={isEditing}
             />
           )
         }

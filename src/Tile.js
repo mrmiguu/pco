@@ -72,9 +72,14 @@ class Tile extends Component {
           }}
         />
       </div>
-      {React.Children.map(this.props.children, child =>
-        React.cloneElement(child, {xy: [x, y]})
-      )}
+
+      {
+        React.Children.map(
+          this.props.children,
+          child => React.cloneElement(child, {xy: [x, y]})
+        )
+      }
+      
     </>
   }
 }
